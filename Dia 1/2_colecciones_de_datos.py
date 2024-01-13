@@ -84,7 +84,7 @@ persona = {
     'nombre': 'Eduardo',
     'edad': 31,
     'nacionalidad': 'PERUANO',
-    'apellido': 'De Rivero'
+    'apellido': 'De Rivero',
 }
 print(persona.keys())  # LLAVES
 print(persona.values())  # VALORES
