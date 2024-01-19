@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request
 from uuid import uuid4
 from flask_cors import CORS
 
@@ -11,7 +11,7 @@ CORS(app=app,
      # desde que dominios se puede acceder a mi API, si queremos que cualquier origen se conecte colocamos el '*'
      origins=['http://localhost:5500', 'http://127.0.0.1:5500'],
      # que headers (cabeceras) pueden enviar a mi API, '*'
-     allow_headers=['accept', 'authorization']
+     allow_headers=['accept', 'authorization', 'content-type']
      )
 
 productos = [
@@ -57,9 +57,32 @@ def gestionProductos():
 @app.route('/producto/<uuid:id>', methods=['GET'])
 def gestionProducto(id):
     print(id)
+    # tenemos una lista de productos en el cual en cada posicion tenemos un diccionario y una llave llamada id
+    # iteren esos productos y vean si existe el producto con determinado id
+    # si no existe entonces retornar un message que diga 'Producto no existe' con un estado 404
+    # PISTA: hacer un for con if y else dentro de el
+    for producto in productos:
+        if producto['id'] == id:
+            return {
+                'content': producto
+            }, 200
+
     return {
-        'content': {}
-    }
+        'message': 'El producto no existe'
+    }, 404
+
+
+@app.route('/producto', methods=['POST'])
+def crearProducto():
+    # convierte la data del body a un dictionary si el body es un JSON
+    data = request.get_json()
+    # antes de guardar la informacion en los productos agregarle el id
+    data['id'] = uuid4()
+
+    productos.append(data)
+    return {
+        'content': data
+    }, 201  # Created
 
 
 if __name__ == '__main__':
