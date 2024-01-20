@@ -56,11 +56,6 @@ def gestionProductos():
 # si yo defino un parametro dinamico ese parametro lo tengo que recibir en la funcion
 @app.route('/producto/<uuid:id>', methods=['GET'])
 def gestionProducto(id):
-    print(id)
-    # tenemos una lista de productos en el cual en cada posicion tenemos un diccionario y una llave llamada id
-    # iteren esos productos y vean si existe el producto con determinado id
-    # si no existe entonces retornar un message que diga 'Producto no existe' con un estado 404
-    # PISTA: hacer un for con if y else dentro de el
     for producto in productos:
         if producto['id'] == id:
             return {
