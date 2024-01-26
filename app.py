@@ -4,6 +4,8 @@ from models.usuario import UsuarioModel
 from models.direccion import DireccionModel
 from flask_migrate import Migrate
 from datetime import datetime
+from marshmallow import Schema, fields
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 
 app = Flask(__name__)
 # print(app.config)
@@ -28,32 +30,53 @@ Migrate(app=app, db=conexion)
 #     conexion.create_all()
 
 
+class UsuarioDTO(Schema):
+    nombre = fields.Str(required=True)
+    apellido = fields.Str()
+    # hace la validacion que cumpla el patron xxxxxxxxx@yyyyyy.zzz
+    correo = fields.Email(required=True)
+    fechaNacimiento = fields.Date()
+    sexo = fields.Str()
+
+
+class UsuarioModelDto(SQLAlchemyAutoSchema):
+    class Meta:
+        # model sirve para indicar desde que modelo nos vamos a referenciar para jalar toda la configuracion de nuestro DTO
+        # en base a las columnas seteara las configuraciones para pedir el tipo de dato necesario, si es que null o no, si es AI ya no lo pide ni las llaves primarias y toda la configuracion de la tabla
+        model = UsuarioModel
+
+
 @app.route('/usuarios', methods=['GET'])
 def gestionarUsuarios():
     # session > un actividad que tenemos con la base de datos
     # SELECT * FROM usuarios;
     resultado = conexion.session.query(UsuarioModel).all()
-    usuarios = []
+    validador = UsuarioModelDto()
+    # el metodo dump solamente convertira un usuario a la vez
+    # a no ser que le coloquemos el parametro que le estamos pasando muchos
+    # many indicamos que le estamos pasando una lista de registros por lo que los tendra que iterar y convertir cada uno de ellos
+    usuarios = validador.dump(resultado, many=True)
+    # usuarios = []
 
-    for usuario in resultado:
-        usuarios.append({
-            'id': usuario.id,
-            'nombre': usuario.nombre,
-            'apellido': usuario.apellido,
-            'correo': usuario.correo,
-            'sexo': usuario.sexo,
-            # string from time > convertir un valor de tipo fecha y hora a string pero colocando el formato
-            # %Y > Devolvera el año
-            # %y > devolver los dos ultimos digitos del año
-            # %m > devuelve los digitos del mes
-            # %B > devuelve el nombre del mes
-            # %b > devuelve las tres primeras letras del mes
-            # %d > dia del mes
-            # %H > hora
-            # %M > minutos
-            # %S > segundos
-            'fechaNacimiento': datetime.strftime(usuario.fechaNacimiento, '%Y-%m-%d')
-        })
+    # for usuario in resultado:
+    #     usuarios.append({
+    #         'id': usuario.id,
+    #         'nombre': usuario.nombre,
+    #         'apellido': usuario.apellido,
+    #         'correo': usuario.correo,
+    #         'sexo': usuario.sexo,
+    #         # string from time > convertir un valor de tipo fecha y hora a string pero colocando el formato
+    #         # %Y > Devolvera el año
+    #         # %y > devolver los dos ultimos digitos del año
+    #         # %m > devuelve los digitos del mes
+    #         # %B > devuelve el nombre del mes
+    #         # %b > devuelve las tres primeras letras del mes
+    #         # %d > dia del mes
+    #         # %H > hora
+    #         # %M > minutos
+    #         # %S > segundos
+    #         'fechaNacimiento': datetime.strftime(usuario.fechaNacimiento, '%Y-%m-%d')
+    #     })
 
     return {
         'content': usuarios
@@ -65,8 +88,14 @@ def crearUsuario():
     try:
         # capturar la informacion
         data = request.get_json()
+        # validador = UsuarioDTO()
+        validador = UsuarioModelDto()
+        # load > pasarle la informacion y ver si es correcta o no y si si lo es devolvera la informacion transformada
+        # si la informacion es incorrecta entonces lanzara un error y este lo podremos recibir en el except
+        dataValidada = validador.load(data)
+
         # creo mi nuevo usuario
-        nuevoUsuario = UsuarioModel(**data)
+        nuevoUsuario = UsuarioModel(**dataValidada)
 
         # Agregar este nuevo registro a la base de datos de manera temporal
         conexion.session.add(nuevoUsuario)
@@ -76,14 +105,16 @@ def crearUsuario():
         conexion.session.commit()
         print('Despues del commit', nuevoUsuario.id)
 
-        usuarioCreado = {
-            'id': nuevoUsuario.id,
-            'nombre': nuevoUsuario.nombre,
-            'apellido': nuevoUsuario.apellido,
-            'correo': nuevoUsuario.correo,
-            'sexo': nuevoUsuario.sexo,
-            'fechaNacimiento': datetime.strftime(nuevoUsuario.fechaNacimiento, '%Y-%m-%d')
-        }
+        # dump > sirve para convertir una instancia de la clase a un diccionario para poder devolverlo
+        usuarioCreado = validador.dump(nuevoUsuario)
+        # usuarioCreado = {
+        #     'id': nuevoUsuario.id,
+        #     'nombre': nuevoUsuario.nombre,
+        #     'apellido': nuevoUsuario.apellido,
+        #     'correo': nuevoUsuario.correo,
+        #     'sexo': nuevoUsuario.sexo,
+        #     'fechaNacimiento': datetime.strftime(nuevoUsuario.fechaNacimiento, '%Y-%m-%d')
+        # }
         return {
             'message': 'Usuario creado exitosamente',
             'content': usuarioCreado  # mostrar el usuario recien creado
@@ -93,7 +124,31 @@ def crearUsuario():
         return {
             'message': 'Error al crear el usuario',
             'content': error.args
-        }
+        }, 400
+
+
+@app.route('/usuario/<int:id>', methods=['GET'])
+def gestionarUsuario(id):
+    # SELECT * FROM usuarios WHERE id = .... LIMIT 1;
+    usuarioEncontrado = conexion.session.query(
+        UsuarioModel).filter_by(id=id).first()
+    # si queremos definir que columnas utilizar al momento de hacer la consultar
+    # SELECT correo, nombre FROM usuarios;
+    prueba = conexion.session.query(
+        UsuarioModel).with_entities(UsuarioModel.correo, UsuarioModel.nombre).all()
+    print(prueba)
+
+    if usuarioEncontrado is None:
+        return {
+            'message': 'El usuario no existe'
+        }, 404
+
+    # usar el UsuarioModelDto para devolver la informacion
+    serializador = UsuarioModelDto()
+    resultado = serializador.dump(usuarioEncontrado)
+    return {
+        'content': resultado
+    }, 200
 
 
 @app.route('/')
