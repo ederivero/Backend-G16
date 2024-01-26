@@ -1,0 +1,5 @@
+flask db init                           > sirve para inicializar las migraciones en nuestro proyecto de flask
+flask db migrate -m "MENSAJE"           > crea una migracion con el nombre que hemos colocado
+flask db upgrade                        > ejecutara las migraciones faltantes en nuestra base de datos
+flask db upgrade --sql [REVISION_ID]    > mostrar el comando SQL mas no ejecutara la migracion
+flask db downgrade [REVISION_ID]        > revertir las migraciones ejecutadas en la base de datos
