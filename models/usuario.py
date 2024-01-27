@@ -16,7 +16,14 @@ class UsuarioModel(conexion.Model):
     apellido = Column(type_=types.String(100))
     fechaNacimiento = Column(name='fecha_nacimiento', type_=types.Date)
     correo = Column(type_=types.String(100), unique=True, nullable=False)
-    sexo = Column(type_=types.String(50), default='NINGUNO')
+    sexo = Column(type_=types.String(50), server_default='NINGUNO')
+    # server_default solo puede aceptar STRING o sqlalchemy.sql.elements.ClauseElement
+    # server_default setea el valor por defecto en la base de datos
+    # mientras que 'default' setea el valor en el backend osea cuando se va a agregar o actualizar el backend le agrega ese valor manualmente
+
+    # cuando agregamos una nueva columna y la tabla ya existe al utilizar un valor por defecto lo que hara sera colocar a todos los registros ese valor
+    # y si no existe la tabla entonces colocara ese valor por defecto a los nuevos registros
+    activo = Column(type_=types.Boolean, server_default='1')
 
     # Ahora para indicar como queremos que se llame esta tabla en la bd
     __tablename__ = 'usuarios'
