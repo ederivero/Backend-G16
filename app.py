@@ -6,8 +6,22 @@ from flask_migrate import Migrate
 from datetime import datetime
 from marshmallow import Schema, fields
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
+from flask_swagger_ui import get_swaggerui_blueprint
+from flask_cors import CORS
+
+swaggerui = get_swaggerui_blueprint(
+    # indicar cual va a ser el endpoint para acceder a la documentacion
+    base_url='/documentacion',
+    # el archivo donde se ubica la documentacion de nuestra API
+    api_url='/static/documentacion.json',
+    config={
+        # el nombre de la aplicacion
+        'app_name': 'API de Usuarios'
+    }
+)
 
 app = Flask(__name__)
+CORS(app=app)
 # print(app.config)
 # app.config almacenara todas las variables que se utilizan en el proyecto de Flask
 # NOTA: No confundir con las variables de entorno!
@@ -17,6 +31,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root@localhost:3306/alumno
 # Inicializar la conexion a nuestra BD
 # al momento de pasarle la aplicacion de flask en esta se encontraras la cadena de conexion a la bd
 conexion.init_app(app)
+app.register_blueprint(swaggerui)
 
 # Migrate sirve para comenzar a registrar los cambios en nuestra base de datos realizados desde nuestro ORM
 Migrate(app=app, db=conexion)
