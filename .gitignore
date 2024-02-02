@@ -1,0 +1,6 @@
+entorno_*
+__pycache__
+# python cache
+*.pyc
+# para evitar subir nuestro archivo con nuestras credenciales 
+.env
