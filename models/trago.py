@@ -11,4 +11,4 @@ class Trago(conexion.Model):
     nombre = Column(type_=types.Text, nullable=False)
     # server_default > sirve para indicar el valor por defecto A NIVEL DE BD en el caso que no se ingrese al momento de hacer una creacion
     # server_default solo acepta string o TextClause
-    disponible = Column(type_=types.Boolean, server_default='true')
+    disponible = Column(type_=types.Boolean, server_default='1')

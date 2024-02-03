@@ -1,0 +1,1 @@
+from .invitado import RegistrarInvitadoDTO
