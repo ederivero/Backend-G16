@@ -57,7 +57,8 @@ class LoginController(Resource):
 
             # identity > sirve para indicar a que usuario le pertenece esa token
             token = create_access_token(identity=barman_encontrado.id, additional_claims={
-                'nombre': barman_encontrado.nombre
+                'nombre': barman_encontrado.nombre,
+                'tipo': 'Barman'
             })
             return {
                 'message': 'Bienvenido',
