@@ -1,9 +1,10 @@
 from flask_restful import Resource, request
-from dtos import RegistrarInvitadoDTO
+from dtos import RegistrarInvitadoDTO, LoginInvitadoDTO
 from requests import get
 from os import environ
 from variables import conexion
 from models import Invitado
+from flask_jwt_extended import create_access_token
 
 
 class InvitadosController(Resource):
@@ -42,3 +43,30 @@ class InvitadosController(Resource):
                 'message': 'Error al crear el invitado',
                 'content': e.args
             }
+
+
+class LoginInvitadoController(Resource):
+    def post(self):
+
+        dto = LoginInvitadoDTO()
+        try:
+            data_validada = dto.load(request.get_json())
+            # SELECT id FROM invitados WHERE dni = 'xxxx' LIMIT 1;
+            invitado_encontrado = conexion.session.query(Invitado).with_entities(Invitado.id).filter_by(
+                dni=data_validada.get('dni')).first()
+            print(invitado_encontrado)
+            if not invitado_encontrado:
+                return {
+                    'message': 'Invitado no existe, prueba con el DNI de tu acompañante'
+                }, 404
+
+            token = create_access_token(identity=invitado_encontrado[0])
+            return {
+                'message': 'Bienvenido',
+                'token': token
+            }
+        except Exception as e:
+            return {
+                'message': 'Error al hacer el login',
+                'content': e.args
+            }, 400

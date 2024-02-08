@@ -1,2 +1,3 @@
-from .invitado import InvitadosController
+from .invitado import InvitadosController, LoginInvitadoController
 from .barman import BarmanController, LoginController
+from .pedido import *
