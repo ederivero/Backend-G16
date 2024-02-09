@@ -23,8 +23,8 @@ class Pedido(conexion.Model):
     estado = Column(type_=types.Enum(EstadoPedidosEnum),
                     server_default=EstadoPedidosEnum.EN_ESPERA.value)
 
-    invitado = Column(ForeignKey(column='invitados.id'),
-                      nullable=False, name='invitado_id')
+    invitadoId = Column(ForeignKey(column='invitados.id'),
+                        nullable=False, name='invitado_id')
 
-    barman = Column(ForeignKey(column='barmans.id'),
-                    name='barman_id')
+    barmanId = Column(ForeignKey(column='barmans.id'),
+                      name='barman_id')

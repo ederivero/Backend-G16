@@ -33,6 +33,8 @@ class CrearPedidoDTO(Schema):
 class TragoDTO(SQLAlchemyAutoSchema):
     class Meta:
         model = Trago
+        # fields  sirve para indicar que atributos queremos utilizar, los que esten declarados seran los que se mostraran
+        fields = ['nombre']
 
 
 class DetallePedidoDTO(SQLAlchemyAutoSchema):
@@ -40,6 +42,7 @@ class DetallePedidoDTO(SQLAlchemyAutoSchema):
 
     class Meta:
         model = DetallePedido
+        fields = ['trago', 'cantidad']
         # si queremos mostrar las llaves foraneas de nuestro modelo entonces definimos el atributo include_fk con True
         # include_fk = True
 
