@@ -17,3 +17,5 @@ class DetallePedido(conexion.Model):
     # NOTA: esto no afecta en nada el funcionamiento a nivel de base de datos
     # backref > creara un atributo virtual en nuestro modelo en el cual estamos creando la relacion, es decir ahora en DetallePedido tendremos un nuevo atributo llamado 'detallePedidos' que este nos devolvera todos sus detalles pedidos
     pedido = orm.relationship('Pedido', backref='detallePedidos')
+
+    trago = orm.relationship('Trago', backref='tragoPedidos')
