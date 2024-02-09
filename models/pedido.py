@@ -20,7 +20,8 @@ class Pedido(conexion.Model):
     fecha_creacion = Column(type_=types.DateTime,
                             server_default=func.now(), nullable=False)
 
-    estado = Column(type_=types.Enum(EstadoPedidosEnum))
+    estado = Column(type_=types.Enum(EstadoPedidosEnum),
+                    server_default=EstadoPedidosEnum.EN_ESPERA.value)
 
     invitado = Column(ForeignKey(column='invitados.id'),
                       nullable=False, name='invitado_id')

@@ -1,8 +1,8 @@
 from flask_restful import Resource, request
 from models import Pedido, DetallePedido, Trago
 from flask_jwt_extended import get_jwt_identity, jwt_required, get_jwt
-from decoradores import validar_invitado
-from dtos import CrearPedidoDTO
+from decoradores import validar_invitado, validar_barman
+from dtos import CrearPedidoDTO, ListarPedidosDTO
 from variables import conexion
 
 
@@ -49,3 +49,17 @@ class PedidosController(Resource):
                 'message': 'Error al crear el pedido',
                 'content': e.args
             }, 400
+
+    @validar_barman
+    def get(self):
+        # devolver los pedidos PERO SOLAMENTE LO PUEDEN VER LOS BARMANS
+        # Crear un DTO para transformar la data al momento de enviarla
+        pedidos = conexion.session.query(Pedido).all()
+        print(pedidos[0].detallePedidos)
+        dto = ListarPedidosDTO()
+        # many > indicar que estaremos pasando una lista de instancias por lo que lo tendra que iterar y transformar cada una de ellas
+        resultado = dto.dump(pedidos, many=True)
+
+        return {
+            'content': resultado
+        }, 200
