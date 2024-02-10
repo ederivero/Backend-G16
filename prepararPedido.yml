@@ -1,0 +1,23 @@
+tags:
+  -  Pedido
+operationId: prepararPedido
+description: El barman se pone a preparar el pedido
+parameters:
+  - in: path
+    name: id
+    required: true
+    schema:
+      type: integer
+      example: 1
+
+security:
+  - Bearer: []
+
+
+responses:
+  200:
+    schema:
+      properties:
+        message:
+          type: string
+          example: Pedido configurado exitosamente

@@ -2,7 +2,7 @@
     "swagger": "2.0",
     "info": {
         "title": "API de barcito de fiestas",
-        "descripcion": "API para mejorar el proceso de pedir y servir tragos en una fiesta",
+        "description": "API para mejorar el proceso de pedir y servir tragos en una fiesta",
         "contact": {
             "responsibleDeveloper": "Eduardo de Rivero",
             "email": "ederiveroman@gmail.com"
@@ -28,6 +28,44 @@
                 "disponible": {
                     "type": "boolean",
                     "example": true
+                }
+            }
+        },
+        "Pedido": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "1"
+                },
+                "estado": {
+                    "type": "string",
+                    "example": "PREPARADO"
+                },
+                "fecha_creacion": {
+                    "type": "string",
+                    "example": "2023-02-09"
+                },
+                "detallePedidos": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "trago": {
+                                "type": "object",
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Ron"
+                                    }
+                                }
+                            },
+                            "cantidad": {
+                                "type": "integer",
+                                "example": 1
+                            }
+                        }
+                    }
                 }
             }
         }

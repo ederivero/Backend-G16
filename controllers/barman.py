@@ -40,6 +40,9 @@ class BarmanController(Resource):
 
 class LoginController(Resource):
     def post(self):
+        """
+        file: loginBarman.yml
+        """
         dto = LoginBarmanDTO()
         try:
             data_validada = dto.load(request.get_json())

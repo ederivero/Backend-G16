@@ -61,6 +61,9 @@ api.add_resource(TragosController, '/tragos')
 @app.route('/preparar-pedido/<int:id>', methods=['POST'])
 @validar_barman
 def prepararPedido(id):
+    """
+    file: prepararPedido.yml
+    """
     barmanId = get_jwt_identity()
 
     # Primero buscar si existe el pedido con ese id
@@ -85,7 +88,7 @@ def prepararPedido(id):
     conexion.session.commit()
     return {
         'message': 'Pedido configurado exitosamente'
-    }
+    }, 200
 
 
 @app.route('/pedido-preparado/<int:id>', methods=['POST'])

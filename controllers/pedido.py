@@ -52,6 +52,10 @@ class PedidosController(Resource):
 
     @validar_barman
     def get(self):
+        # Cuando utilizamos un decorador dentro de un metodo y este decorador es un decorador manual lo que sucede es que se basara en la ubicacion de este decorador (el decorador se encuentra en el nivel mas afuera de la aplicacion) entonces toma como punto de referencia esa ubicacion y por lo que al utilizar un archivo de documentacion tenemos que indicarle la carpeta donde se ubica ese archivo
+        """
+        file: controllers/devolverPedidos.yml
+        """
         # devolver los pedidos PERO SOLAMENTE LO PUEDEN VER LOS BARMANS
         # Crear un DTO para transformar la data al momento de enviarla
         pedidos = conexion.session.query(Pedido).all()
