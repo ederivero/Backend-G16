@@ -10,6 +10,9 @@ from flask_jwt_extended import create_access_token
 class InvitadosController(Resource):
     # el metodo tiene que ser en minusculas sino no lo reconocera
     def post(self):
+        """
+        file: crearInvitado.yml
+        """
         dto = RegistrarInvitadoDTO()
         try:
             data_serializada = dto.load(request.get_json())
@@ -36,13 +39,13 @@ class InvitadosController(Resource):
             conexion.session.commit()
             return {
                 'message': 'Invitado creado exitosamente'
-            }
+            }, 201
         except Exception as e:
             print(e)
             return {
                 'message': 'Error al crear el invitado',
                 'content': e.args
-            }
+            }, 400
 
 
 class LoginInvitadoController(Resource):

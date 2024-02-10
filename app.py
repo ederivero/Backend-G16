@@ -1,7 +1,6 @@
 from flask import Flask
 from flask_migrate import Migrate
-from variables import conexion
-from dotenv import load_dotenv
+from variables import conexion, clienteTwilio
 # os > operating system
 from os import environ
 from models import *
@@ -11,10 +10,9 @@ from flask_jwt_extended import JWTManager, get_jwt_identity
 from datetime import timedelta
 from decoradores import validar_barman
 from models.pedido import EstadoPedidosEnum
-
-# leear el archivo .env si existe y agregara todas las variables al entorno como si fuesen variables de entorno del sistema
-# tiene que ir en la parte mas alta del archivo principal para que pueda ser utilizado en todo el proyecto
-load_dotenv()
+from flasgger import Swagger
+# load convierte la informacion de un json a un diccionario
+from json import load
 
 app = Flask(__name__)
 api = Api(app=app)
@@ -27,6 +25,25 @@ app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1, minutes=30)  # 90
 
 conexion.init_app(app)
 
+swaggerConfig = {
+    'headers': [],  # las cabeceras que podra aceptar nuestra documentacion
+    'specs': [
+        {
+            'endpoint': '',  # el endpoint inicial de nuestra documentacion
+            # mi ruta base de mi documentacion (hacia donde hara los requests)
+            'route': '/'
+        }
+    ],
+    # Donde cargara los archivos staticos de swagger para la intefaz grafica
+    # para indicar esto tenemos que colocar la opcion 'swagger_ui': True sino podemos obviar este paso
+    'static_url_path': '/flassger_static',
+    # el endpoint en el cual ahora estara alojada la documentacion de swagger
+    'specs_route': '/documentacion'
+
+}
+
+swaggerTemplate = load(open('swagger_template.json'))
+Swagger(app=app, template=swaggerTemplate, config=swaggerConfig)
 
 JWTManager(app=app)
 # Esto crea la utilizacion de las migraciones en nuestro proyecto de flask
@@ -38,6 +55,7 @@ api.add_resource(BarmanController, '/barman')
 api.add_resource(LoginController, '/login')
 api.add_resource(LoginInvitadoController, '/login-invitado')
 api.add_resource(PedidosController, '/pedidos')
+api.add_resource(TragosController, '/tragos')
 
 
 @app.route('/preparar-pedido/<int:id>', methods=['POST'])
@@ -89,9 +107,16 @@ def pedidoPreparado(id):
         }, 400
     conexion.session.query(Pedido).filter(Pedido.id == id).update(
         {Pedido.estado: EstadoPedidosEnum.PREPARADO})
-
     conexion.session.commit()
 
+    mensaje = clienteTwilio.messages.create(
+        from_='+16593365113',
+        to=f'+51{pedido_encontrado.invitado.telefono}',
+        body=f'''Hola {pedido_encontrado.invitado.nombre}.
+Tu pedido de la barra ya esta listo, puedes retirarlo 🍸''',
+    )
+    # sid> identificador del mensaje por si lo queremos validar en la pagina de twilio
+    print(mensaje.sid)
     return {
         'message': 'Pedido completado'
     }, 200

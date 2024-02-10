@@ -1,0 +1,43 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "API de barcito de fiestas",
+        "descripcion": "API para mejorar el proceso de pedir y servir tragos en una fiesta",
+        "contact": {
+            "responsibleDeveloper": "Eduardo de Rivero",
+            "email": "ederiveroman@gmail.com"
+        },
+        "version": "1.0"
+    },
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "definitions": {
+        "Trago": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "example": "1"
+                },
+                "nombre": {
+                    "type": "string",
+                    "example": "Ron"
+                },
+                "disponible": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "authorization",
+            "in": "header",
+            "description": "Por favor ingresa la token del invitado o barman"
+        }
+    }
+}
