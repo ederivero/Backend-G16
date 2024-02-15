@@ -13,10 +13,11 @@ from models.pedido import EstadoPedidosEnum
 from flasgger import Swagger
 # load convierte la informacion de un json a un diccionario
 from json import load
+from flask_cors import CORS
 
 app = Flask(__name__)
 api = Api(app=app)
-
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DATABASE_URL')
 
 # configuraciones para mi JWT
