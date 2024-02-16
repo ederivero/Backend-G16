@@ -7,5 +7,12 @@
 </head>
 <body>
     <p>Hola desde DJANGO</p>
+    <p>El usuario es: {{nombre}} {{apellido}}</p>
+    <p>y sus hobbies son:</p>
+    <ul>
+        {% for hobbie in hobbies %}
+        <li>{{ hobbie.descripcion }}</li>
+        {% endfor %}
+    </ul>
 </body>
 </html>

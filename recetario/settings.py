@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     # cada vez que creamos o agregamos una aplicacion al proyecto esta se agregue en esta seccion sino django no la reconocera
-    'gestion'
+    'gestion',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
