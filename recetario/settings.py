@@ -78,8 +78,12 @@ WSGI_APPLICATION = 'recetario.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'recetario_db',  # nombre de la base de datos
+        'PASSWORD': 'root',  # password del acceso
+        'USER': 'postgres',  # usuario para poder acceder a mi servidor de bd
+        'HOST': 'localhost',  # lugar donde esta alojada mi bd
+        'PORT': '5432'  # puerto para conectarnos al servidor
     }
 }
 
