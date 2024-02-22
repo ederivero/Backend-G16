@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from .models import Plato
 from .serializers import PlatoSerializer
+from rest_framework import status
+from os import remove
 
 
 def vistaPrueba(request):
@@ -46,3 +48,80 @@ class PlatosController(APIView):
             'message': 'Me hicieron get',
             'content': serializador.data
         })
+
+    def post(self, request):
+        print(request.data)
+        serializador = PlatoSerializer(data=request.data)
+        # valida si la informacion enviada por el cliente es correcta o no, devolvera un Boolean
+        validacion = serializador.is_valid()
+        if validacion:
+            # el serializador al momento de vincularlo con un modelo se crean metodos para guardar (save) y actualizar (update)
+            serializador.save()
+
+            return Response(data={
+                'message': 'Plato creado exitosamente'
+            }, status=status.HTTP_201_CREATED)
+        else:
+            return Response(data={
+                'message': 'Error al crear el plato',
+                'content': serializador.errors  # errores al momento de hacer la validacion
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PlatoController(APIView):
+    def get(self, request, id):
+        plato_encontrado = Plato.objects.filter(id=id).first()
+        if not plato_encontrado:
+            return Response(data={
+                'message': 'El plato no existe'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        serializador = PlatoSerializer(instance=plato_encontrado)
+        return Response(data={
+            'content': serializador.data
+        })
+
+    def put(self, request, id):
+        plato_encontrado = Plato.objects.filter(id=id).first()
+        if not plato_encontrado:
+            return Response(data={
+                'message': 'El plato no existe'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        imagen_antigua = plato_encontrado.foto.path
+
+        serializador = PlatoSerializer(data=request.data)
+        # validated_data > informacion que ya fue revisada y aprobada. Para utilizarla tenemos que llamar previamente al metodo is_valid
+        if serializador.is_valid():
+            # es un metodo que tbn se encuentra al momento de usar un ModelSerializer y sirve para actualizar el registro sin mucho trabajo
+            resultado = serializador.update(instance=plato_encontrado,
+                                            validated_data=serializador.validated_data)
+            # ya se actualizo mi registro en la base de datos
+
+            # eliminamos el archivo que ya no vamos a necesitar de nuestro servidor
+            remove(imagen_antigua)
+            return Response(data={
+                'message': 'Plato actualizado exitosamente'
+            })
+
+        else:
+            return Response(data={
+                'message': 'Error al actualizar el plato',
+                'content': serializador.errors
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        plato_encontrado = Plato.objects.filter(id=id).first()
+        if not plato_encontrado:
+            return Response(data={
+                'message': 'El plato no existe'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        imagen_antigua = plato_encontrado.foto.path
+        # DELETE FROM platos WHERE id = ...;
+        Plato.objects.filter(id=id).delete()
+
+        # eliminamos la imagen de nuestro servidor
+        remove(imagen_antigua)
+
+        return Response(data=None, status=status.HTTP_204_NO_CONTENT)

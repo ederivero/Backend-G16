@@ -128,3 +128,10 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# https://docs.djangoproject.com/en/5.0/ref/settings/#media-root
+MEDIA_ROOT = BASE_DIR / 'archivos'
+
+# variable que servira para indicar la ruta de nuestros archivos declarados en la variable MEDIA_ROOT
+# si no quieren colocar un prefijo en el archivo coloquen el '/'
+MEDIA_URL = '/'
