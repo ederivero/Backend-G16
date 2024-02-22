@@ -5,3 +5,6 @@ python manage.py migrate                                    > ejecuta las migrac
 python manage.py sqlmigrate NOMBRE_APP NUM_MIGRACION        > mostrar el codigo SQL de esa migracion pero no la ejecutara
 python manage.py createsuperuser                            > crea un superusuario para poder acceder al panel administrativo
 python manage.py startapp NOMBRE_APP                        > crea una aplicacion dentro del proyecto actual
+python manage.py makemigrations NOMBRE_APP --name NOMBRE_MIGRACION > buscara los cambios de nuestras tablas y creara la migracion con esos cambios
+python manage.py dbshell                                    > crea una conexion con nuestra base de datos para poder consultar y manipular la data de la base de datos
+python manage.py shell                                      > crea una terminal en la cual podemos utilizar los modelos declarados para poder obtener la data y manipularla
