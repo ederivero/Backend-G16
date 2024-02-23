@@ -27,8 +27,9 @@ class Ingrediente(models.Model):
     # SET_NULL > permite la eliminacion del plato y le cambia el valor a sus ingredientes a la columna plato_id a NULL (los deja huerfanos)
     # SET_DEFAULT > permite la eliminacion del plato y cambia el valor de la columna a un valor por defecto
     # DO_NOTHING > permite la eliminacion del plato y no cambia el valor del ingrediente del plato_id generando inconsistencia de datos
-    plato = models.ForeignKey(
-        to=Plato, db_column='plato_id', on_delete=models.PROTECT)
+    # related_name > funciona muy similar al relationships de flask y eso significa que creara un atributo virtual en el modelo en el cual estemos creando la conexion, en este caso en el modelo PLATO
+    platoId = models.ForeignKey(
+        to=Plato, db_column='plato_id', on_delete=models.PROTECT, related_name='ingredientes')
 
     class Meta:
         db_table = 'ingredientes'
@@ -38,8 +39,8 @@ class Preparacion(models.Model):
     id = models.AutoField(primary_key=True, null=False)
     descripcion = models.TextField(null=False)
     orden = models.IntegerField(null=False)
-    plato = models.ForeignKey(
-        to=Plato, db_column='plato_id', on_delete=models.PROTECT)
+    platoId = models.ForeignKey(
+        to=Plato, db_column='plato_id', on_delete=models.PROTECT, related_name='preparaciones')
 
     class Meta:
         db_table = 'preparaciones'
@@ -50,4 +51,4 @@ class Preparacion(models.Model):
         ordering = ['-orden']
         # el orden y el plato al cual pertenece esta preparacion jamas se puede repetir
         # unique_together si se da a nivel de base de datos (se crea la contraint UNIQUE en la base de datos)
-        unique_together = [['orden', 'plato']]
+        unique_together = [['orden', 'platoId']]
