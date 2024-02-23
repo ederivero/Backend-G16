@@ -9,6 +9,8 @@ from .serializers import (PlatoSerializer,
                           PlatoConIngredientesYPreparacionesSerializer)
 from rest_framework import status
 from os import remove
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
 
 def vistaPrueba(request):
@@ -168,6 +170,28 @@ def listarIngredientesPlato(request, id):
         })
 
 
+@swagger_auto_schema(method='post',
+                     request_body=PreparacionSerializer,
+                     responses={
+                         201: openapi.Response('respuesta exitosa',
+                                               examples={
+                                                   'application/json': {
+                                                       'message': 'Preparacion agregada con exitosamente al plato',
+                                                       'content': {
+                                                           'id': 1,
+                                                           'descripcion': '',
+                                                           'orden': 1,
+                                                           'platoId': 10
+                                                       }
+                                                   }
+                                               }),
+                         400: openapi.Response('respuesta fallida',
+                                               examples={
+                                                   'application/json': {
+                                                       'message': 'Error al crear la preparacion',
+                                                       'content': ' errores'
+                                                   }
+                                               })})
 @api_view(http_method_names=['POST'])
 def crearPreparacion(request):
     serializador = PreparacionSerializer(data=request.data)
@@ -186,12 +210,32 @@ def crearPreparacion(request):
         }, status=status.HTTP_400_BAD_REQUEST)
 
 
+@swagger_auto_schema(method='get', responses={200: openapi.Response(description='recetas', examples={
+    'application/json': {
+        'content':  'PlatoConIngredientesYPreparacionesModel'
+    }
+}, schema=PlatoConIngredientesYPreparacionesSerializer)})
 @api_view(http_method_names=['GET'])
 def buscarRecetas(request):
     print(request.query_params)
     # https://docs.djangoproject.com/en/5.0/topics/db/queries/#field-lookups
-    resultado = Plato.objects.filter(nombre__icontains='pApA')  # .query
-    print(resultado)
-    return Response(data={
-        'content': ''
-    })
+    if request.query_params.get('nombre'):
+        # obtenemos el valor del query param
+        nombre = request.query_params.get('nombre')
+
+        # buscamos los platos por su filtro
+        resultado = Plato.objects.filter(
+            nombre__icontains=nombre).all()  # .query
+
+        # le pasamos al serializador nuestro resultado
+        serializador = PlatoConIngredientesYPreparacionesSerializer(
+            instance=resultado, many=True)
+
+        print(resultado)
+        return Response(data={
+            'content': serializador.data
+        })
+    else:
+        return Response(data={
+            'message': 'Falta el nombre en el query param'
+        }, status=status.HTTP_400_BAD_REQUEST)

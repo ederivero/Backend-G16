@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # cada vez que creamos o agregamos una aplicacion al proyecto esta se agregue en esta seccion sino django no la reconocera
     'gestion',
-    'rest_framework'
+    'rest_framework',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -135,3 +136,10 @@ MEDIA_ROOT = BASE_DIR / 'archivos'
 # variable que servira para indicar la ruta de nuestros archivos declarados en la variable MEDIA_ROOT
 # si no quieren colocar un prefijo en el archivo coloquen el '/'
 MEDIA_URL = '/'
+
+# es todo lo relacionado con la libreria de drf-yasg
+# https://drf-yasg.readthedocs.io/en/stable/settings.html
+SWAGGER_SETTINGS = {
+    # cargar la informacion del ejemplo por defecto sin la necesidad de hacer click
+    'DEFAULT_MODEL_RENDERING': 'example'
+}

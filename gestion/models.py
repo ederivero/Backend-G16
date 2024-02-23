@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser
 
 
 class Plato(models.Model):
@@ -52,3 +53,30 @@ class Preparacion(models.Model):
         # el orden y el plato al cual pertenece esta preparacion jamas se puede repetir
         # unique_together si se da a nivel de base de datos (se crea la contraint UNIQUE en la base de datos)
         unique_together = [['orden', 'platoId']]
+
+
+# vamos a utilizar el modelo auth_user proveniente del panel administrativo
+class Cheff(AbstractBaseUser):
+    # permite modificar por completo mi tabla auth_user de django
+    id = models.AutoField(primary_key=True, null=False)
+    nombre = models.TextField(null=False)
+    # EmailField > a parte de guardar como un texto en la base de datos añade validacion para que el texto ingresado sea un correo
+    correo = models.EmailField(unique=True, null=False)
+    # si vamos a configurar la password si o si tiene que llamarse password
+    password = models.TextField(null=False)
+
+    # para que siga funcionando el panel administrativo de django tenemos que configurar las siguientes columnas
+    # is_staff > sirve para indicar que el usuario que estamos creando puede tener acceso al panel administrativo
+    is_staff = models.BooleanField(default=False)
+    # is_active > sirve para indicar si el usuario tiene acceso o no al panel administrativo y este se puede cambiar si, por ejemplo el usuario deja de estar activo en la aplicacion
+    is_active = models.BooleanField(default=True)
+
+    # para poder realizar el login en el panel administrativo tenemos que definir que columna se usara como username
+    USERNAME_FIELD = 'correo'
+    # sirve para pedirle al usuario al momento de crear un superusuario por la consola
+    # python manage.py createsuperuser
+    # no se debe declarar el atributo del username_field ni los campos password
+    REQUIRED_FIELDS = ['nombre']
+
+    class Meta:
+        db_table = 'cheffs'
