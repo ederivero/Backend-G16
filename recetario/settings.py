@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -41,6 +42,7 @@ INSTALLED_APPS = [
     'gestion',
     'rest_framework',
     'drf_yasg',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -146,3 +148,17 @@ SWAGGER_SETTINGS = {
 
 # indicar si cambiamos el auth_user a uno nuevo
 AUTH_USER_MODEL = 'gestion.Cheff'
+
+
+# Modificar las configuraciones de mi Django Rest Framework
+REST_FRAMEWORK = {
+    # Sirve para indicar a DRF que ahora la autenticacion la realizara mediante la nueva libreria agregada
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+}
+
+# https://django-rest-framework-simplejwt.readthedocs.io/en/latest/settings.html
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1, minutes=30)
+}

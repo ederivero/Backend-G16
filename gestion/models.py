@@ -9,6 +9,60 @@ TipoPlatoOpciones = [
     ('golosinas', 'GOLOSINA')
 ]
 
+# sirve para poder indicar como vamos a manejar a nuestro usuario en el proyecto
+
+
+class ManejadorUsuario(BaseUserManager):
+    def create_superuser(self, nombre, correo, password):
+        if not correo:
+            raise ValueError('El usuario tiene que tener un correo')
+
+        # metodo propio del auth_user y sirve para poner el correo TODO en minusculas y quitar espacios al comienzo y final
+        correo_normalizado = self.normalize_email(correo)
+
+        nuevo_usuario = self.model(correo=correo, nombre=nombre)
+        # set_password > generar el hash de mi password y no guardarla directamente en la bd
+        nuevo_usuario.set_password(password)
+
+        nuevo_usuario.is_superuser = True
+        nuevo_usuario.is_staff = True
+
+        # ahora procedo a guardar mi nuevo usuario
+        nuevo_usuario.save()
+
+
+# vamos a utilizar el modelo auth_user proveniente del panel administrativo
+# PermissionsMixin > sirve para indicarle a nuestro proyecto que ahora esta tabla tbn sera la encargada de manejar el sistema de permisos, es decir ahi se centraran todos los permisos que demos a nuestra aplicacion en el panel administrativo
+
+
+class Cheff(AbstractBaseUser, PermissionsMixin):
+    # permite modificar por completo mi tabla auth_user de django
+    id = models.AutoField(primary_key=True, null=False)
+    nombre = models.TextField(null=False)
+    # EmailField > a parte de guardar como un texto en la base de datos añade validacion para que el texto ingresado sea un correo
+    correo = models.EmailField(unique=True, null=False)
+    # si vamos a configurar la password si o si tiene que llamarse password
+    password = models.TextField(null=False)
+
+    # para que siga funcionando el panel administrativo de django tenemos que configurar las siguientes columnas
+    # is_staff > sirve para indicar que el usuario que estamos creando puede tener acceso al panel administrativo
+    is_staff = models.BooleanField(default=False)
+    # is_active > sirve para indicar si el usuario tiene acceso o no al panel administrativo y este se puede cambiar si, por ejemplo el usuario deja de estar activo en la aplicacion
+    is_active = models.BooleanField(default=True)
+
+    # para poder realizar el login en el panel administrativo tenemos que definir que columna se usara como username
+    USERNAME_FIELD = 'correo'
+    # sirve para pedirle al usuario al momento de crear un superusuario por la consola
+    # python manage.py createsuperuser
+    # no se debe declarar el atributo del username_field ni los campos password
+    REQUIRED_FIELDS = ['nombre']
+
+    # vamos a modificar el comportamiento del atributo objects para que pueda aceptar una creacion de superusuario por consola
+    objects = ManejadorUsuario()
+
+    class Meta:
+        db_table = 'cheffs'
+
 
 class Plato(models.Model):
     # https://docs.djangoproject.com/en/5.0/ref/models/fields/
@@ -20,6 +74,8 @@ class Plato(models.Model):
     tipo = models.TextField(choices=TipoPlatoOpciones,
                             default=TipoPlatoOpciones[0][0]  # entrada
                             )
+    cheffId = models.ForeignKey(
+        to=Cheff, db_column='cheff_id', on_delete=models.RESTRICT, null=True)
 
     class Meta:
         # https://docs.djangoproject.com/en/5.0/ref/models/options/
@@ -65,55 +121,3 @@ class Preparacion(models.Model):
         # el orden y el plato al cual pertenece esta preparacion jamas se puede repetir
         # unique_together si se da a nivel de base de datos (se crea la contraint UNIQUE en la base de datos)
         unique_together = [['orden', 'platoId']]
-
-
-# sirve para poder indicar como vamos a manejar a nuestro usuario en el proyecto
-class ManejadorUsuario(BaseUserManager):
-    def create_superuser(self, nombre, correo, password):
-        if not correo:
-            raise ValueError('El usuario tiene que tener un correo')
-
-        # metodo propio del auth_user y sirve para poner el correo TODO en minusculas y quitar espacios al comienzo y final
-        correo_normalizado = self.normalize_email(correo)
-
-        nuevo_usuario = self.model(correo=correo, nombre=nombre)
-        # set_password > generar el hash de mi password y no guardarla directamente en la bd
-        nuevo_usuario.set_password(password)
-
-        nuevo_usuario.is_superuser = True
-        nuevo_usuario.is_staff = True
-
-        # ahora procedo a guardar mi nuevo usuario
-        nuevo_usuario.save()
-
-# vamos a utilizar el modelo auth_user proveniente del panel administrativo
-# PermissionsMixin > sirve para indicarle a nuestro proyecto que ahora esta tabla tbn sera la encargada de manejar el sistema de permisos, es decir ahi se centraran todos los permisos que demos a nuestra aplicacion en el panel administrativo
-
-
-class Cheff(AbstractBaseUser, PermissionsMixin):
-    # permite modificar por completo mi tabla auth_user de django
-    id = models.AutoField(primary_key=True, null=False)
-    nombre = models.TextField(null=False)
-    # EmailField > a parte de guardar como un texto en la base de datos añade validacion para que el texto ingresado sea un correo
-    correo = models.EmailField(unique=True, null=False)
-    # si vamos a configurar la password si o si tiene que llamarse password
-    password = models.TextField(null=False)
-
-    # para que siga funcionando el panel administrativo de django tenemos que configurar las siguientes columnas
-    # is_staff > sirve para indicar que el usuario que estamos creando puede tener acceso al panel administrativo
-    is_staff = models.BooleanField(default=False)
-    # is_active > sirve para indicar si el usuario tiene acceso o no al panel administrativo y este se puede cambiar si, por ejemplo el usuario deja de estar activo en la aplicacion
-    is_active = models.BooleanField(default=True)
-
-    # para poder realizar el login en el panel administrativo tenemos que definir que columna se usara como username
-    USERNAME_FIELD = 'correo'
-    # sirve para pedirle al usuario al momento de crear un superusuario por la consola
-    # python manage.py createsuperuser
-    # no se debe declarar el atributo del username_field ni los campos password
-    REQUIRED_FIELDS = ['nombre']
-
-    # vamos a modificar el comportamiento del atributo objects para que pueda aceptar una creacion de superusuario por consola
-    objects = ManejadorUsuario()
-
-    class Meta:
-        db_table = 'cheffs'
