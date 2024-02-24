@@ -2,11 +2,12 @@ from django.shortcuts import render
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from .models import Plato, Ingrediente
+from .models import Plato, Ingrediente, Cheff
 from .serializers import (PlatoSerializer,
                           IngredienteSerializer,
                           PreparacionSerializer,
-                          PlatoConIngredientesYPreparacionesSerializer)
+                          PlatoConIngredientesYPreparacionesSerializer,
+                          RegistroCheffSerializer)
 from rest_framework import status
 from os import remove
 from drf_yasg.utils import swagger_auto_schema
@@ -238,4 +239,26 @@ def buscarRecetas(request):
     else:
         return Response(data={
             'message': 'Falta el nombre en el query param'
+        }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(http_method_names=['POST'])
+def crearCheff(request):
+    serializador = RegistroCheffSerializer(data=request.data)
+    if serializador.is_valid():
+        nuevo_cheff = Cheff(nombre=serializador.validated_data.get('nombre'),
+                            correo=serializador.validated_data.get('correo'))
+        # set_password > sirve para generar el hash de nuestra password
+        nuevo_cheff.set_password(serializador.validated_data.get('password'))
+        nuevo_cheff.save()
+        print(request.data.get('correo'))
+
+        return Response(data={
+            'message': 'cheff creado exitosamente',
+            'content': serializador.data
+        }, status=status.HTTP_201_CREATED)
+    else:
+        return Response(data={
+            'message': 'Error al crear el cheff',
+            'content': serializador.errors
         }, status=status.HTTP_400_BAD_REQUEST)

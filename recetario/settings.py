@@ -143,3 +143,6 @@ SWAGGER_SETTINGS = {
     # cargar la informacion del ejemplo por defecto sin la necesidad de hacer click
     'DEFAULT_MODEL_RENDERING': 'example'
 }
+
+# indicar si cambiamos el auth_user a uno nuevo
+AUTH_USER_MODEL = 'gestion.Cheff'
