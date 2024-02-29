@@ -1,0 +1,15 @@
+{
+    "name": "pruebas",
+    "description": "Es un proyecto de prueba que sirve para aprender de node",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "saludar": "echo Hola Mundo",
+        "start": "node index.js"
+    },
+    "author": {
+        "name": "Eduardo de Rivero",
+        "email": "ederiveroman@gmail.com"
+    }
+}

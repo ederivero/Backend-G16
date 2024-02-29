@@ -1,0 +1,20 @@
+{
+  "name": "introduccion_express",
+  "version": "1.0.0",
+  "description": "Introduccion a express",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "node",
+    "backend",
+    "express",
+    "codigo"
+  ],
+  "author": "Eduardo de Rivero",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
