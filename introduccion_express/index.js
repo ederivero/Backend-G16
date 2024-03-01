@@ -78,7 +78,21 @@ const empleados = [
 ]
 
 // crear un endpoint en el cual se llame filtrar-empleados y en base al nombre pasado como query param devolver todos los empleados con ese filtro
+servidor.get('/filtrar-empleados',(req,res)=>{
+    const  {nombre}  = req.query // { nombre: 'Juanito Perez' }
+    // !variable > variable tiene que ser null o undefined para que cumpla la condicion
+    if(!nombre){
+        return res.json({
+            content: empleados
+        })
+    }
 
+    const empleadosFiltrados = empleados.filter((empleado)=> empleado.nombre === nombre)
+
+    return res.json({
+        content: empleadosFiltrados
+    })
+})
 
 
 servidor.listen(3000, ()=>{

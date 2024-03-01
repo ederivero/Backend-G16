@@ -1,0 +1,23 @@
+{
+  "name": "express_con_prisma",
+  "version": "1.0.0",
+  "description": "Uso de express con el ORM de prisma",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "crear:migracion": "prisma migrate dev"
+  },
+  "keywords": [
+    "Express",
+    "NodeJs",
+    "prisma",
+    "backend"
+  ],
+  "author": "Eduardo de Rivero",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^5.10.2",
+    "dotenv": "^16.4.5",
+    "prisma": "^5.10.2"
+  }
+}

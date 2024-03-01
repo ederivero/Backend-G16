@@ -1,0 +1,43 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:root@localhost:5432/minimarket?schema=public"
+}
+
+model Categoria {
+  // nombre de la columna | Tipo de dato GENERICO | propiedades de la columna
+  // id INTEGER AUTO_INCREMENT PRIMARY KEY,
+  id         Int      @id @default(autoincrement())
+  nombre     String   @db.Text // si queremos ser mas explicitos en el tipo de dato 
+  // Al poner el ? en el tipo de dato generico indicamos que esa columna puede tener valores vacios
+  habilitado Boolean? @default(true) @map("disponible")
+
+  // una categoria puede tener muchos productos
+  // 
+  productos Producto[]
+
+  // Configuraciones de la tabla
+  // map > indicar como se va a llamar esta tabla o columna en la base de datos
+  @@map("categorias")
+}
+
+model Producto {
+  id          Int    @id @default(autoincrement())
+  nombre      String
+  precio      Float?
+  categoriaId Int    @map("categoria_id")
+
+  // un producto tendra una categoria
+  categoria Categoria @relation(fields: [categoriaId], references: [id])
+
+  @@map("productos")
+}

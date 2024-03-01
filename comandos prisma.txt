@@ -1,0 +1,2 @@
+npx prisma init         > inicializa el proyecto para usar prisma
+npx prisma migrate dev  >  crear una nueva migracion
