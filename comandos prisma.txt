@@ -1,2 +1,4 @@
 npx prisma init         > inicializa el proyecto para usar prisma
-npx prisma migrate dev  >  crear una nueva migracion
+npx prisma migrate dev  >  crear una nueva migracion pero tambien se puede utilizar para volver a generar nuestro cliente de prisma
+npx prisma migrate dev --create-only > crea una migracion vacia para que nosotros le indiquemos que se debe de realizar en dicha migracion
+npx prisma migrate deploy > efectua las migraciones faltantes en la base de datos

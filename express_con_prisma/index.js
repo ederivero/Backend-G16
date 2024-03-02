@@ -133,6 +133,118 @@ servidor.route('/productos').post(asyncHandler(async (req, res) => {
     })
 }))
 
+servidor.route('/producto/:id').get(asyncHandler(async (req, res) => {
+    const { id } = req.params
+    // include > indicar si quiero agregar un modelo adyacente a este
+    // no se puede utilizar el include y el select a la vez 
+    const productoEncontrado = await conexion.producto.findUniqueOrThrow({
+        where: { id: +id },
+        // include: {
+        //     categoria: true
+        // },
+        select: {
+            id: true,
+            nombre: true,
+            precio: true,
+            categoria: true // si vamos a seleccionar las columnas que queremos mostrar entonces aqui tbn deberemos de poner los modelos que queremos incluir y ya no usar el include
+        }
+    })
+
+    return res.json({
+        content: productoEncontrado
+    })
+}))
+
+const validacionCategoriaConProductos = Joi.object({
+    nombre: Joi.string().required(),
+    habilitado: Joi.boolean().optional(),
+    productos: Joi.array().items(
+        Joi.object({
+            nombre: Joi.string().required(),
+            precio: Joi.number().precision(2).optional()
+        })
+    )
+})
+
+servidor.post('/crear-categoria-con-productos', asyncHandler(async (req, res) => {
+    /*
+        {
+            nombre: 'Juguetes',
+            habilitado: true,
+            productos: [
+                {
+                    nombre: 'Max Steel',
+                    precio: 40
+                },
+                {
+                    nombre: 'Barbie Obrera',
+                    precio: 45
+                }
+            ]
+        }
+    */
+    // al tener una serie de operaciones que van a modificar la data en nuestra base de datos se recomienda usar una transaccion
+    const validacion = validacionCategoriaConProductos.validate(req.body)
+
+    if (validacion.error) {
+        return res.status(400).json({
+            message: 'Error al crear la categoria con productos',
+            content: validacion.error
+        })
+    }
+
+    await conexion.$transaction(async (conectorLocal) => {
+        // Todo lo que este aca adentro de la transaccion si llega a fallar todas las operaciones de escritura en la bd quedaran sin efecto
+        const { productos, nombre, habilitado } = validacion.value
+
+        const nuevaCategoria = await conectorLocal.categoria.create({
+            data: {
+                nombre,
+                habilitado
+            }
+        })
+
+        // Forma con el uso de FOR (Facil)
+        for (let i = 0; i < productos.length; i++) {
+            await conectorLocal.producto.create({
+                data: {
+                    // productos[i] > {nombre: '....' , precio : ....}
+                    // nombre: productos[i].nombre,
+                    // precio: productos[i].precio,
+                    ...productos[i],
+                    categoriaId: nuevaCategoria.id
+                }
+            })
+        }
+        // Forma usando un map y un create many
+        // Esta forma es mas optima porque, ademas de usar un map en vez de un for solamente se hace una peticion a la base de datos con el createMany y se le envian todos los nuevos productos mientras que con la forma anterior por cada insercion se realiza una peticion a la base de datos
+        await conectorLocal.producto.createMany({
+            data: productos.map((producto) => {
+                return {
+                    // nombre: producto.nombre,
+                    // precio: producto.precio,
+                    ...producto,
+                    categoriaId: nuevaCategoria.id
+                }
+            })
+        })
+    })
+
+    return res.status(201).json({
+        message: 'Operacion finalizada exitosamente'
+    })
+}))
+
+
+
+
+
+
+
+
+
+// ------- ZONA MIDDLEWARES ---------------
+
 // Middleware validara que al ya no encontrar mas rutas, entrar a esa por defecto, si lo ponemos antes siempre me iba a devolver este mensaje de error
 servidor.use((req, res, next) => {
     res.status(404).json({
