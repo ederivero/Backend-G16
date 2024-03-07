@@ -10,7 +10,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  url      = env("DATABASE_URL2")
 }
 
 model Categoria {
@@ -30,8 +30,70 @@ model Producto {
   imagen         String?
   descripcion    String?
 
-  categoriaId String    @map("categoria_id") @db.Uuid
-  categoria   Categoria @relation(fields: [categoriaId], references: [id])
+  categoriaId    String          @map("categoria_id") @db.Uuid
+  categoria      Categoria       @relation(fields: [categoriaId], references: [id])
+  detallePedidos DetallePedido[]
 
   @@map("productos")
+}
+
+model Usuario {
+  id       String @id @default(uuid()) @db.Uuid
+  nombre   String
+  apellido String
+  correo   String @unique
+  password String
+
+  direcciones Direccion[]
+  pedidos     Pedido[]
+
+  @@map("usuarios")
+}
+
+model Direccion {
+  id           String @id @default(uuid()) @db.Uuid
+  calle        String
+  numero       String
+  distrito     String
+  provincia    String
+  departamento String
+
+  clienteId String   @map("cliente_id") @db.Uuid
+  cliente   Usuario  @relation(fields: [clienteId], references: [id])
+  pedidos   Pedido[]
+
+  @@map("direcciones")
+}
+
+model Pedido {
+  id          String       @id @default(uuid()) @db.Uuid
+  fecha       DateTime
+  total       Float
+  estado      EstadoPedido
+  clienteId   String       @map("cliente_id") @db.Uuid
+  direccionId String?      @map("direccion_id") @db.Uuid
+
+  cliente        Usuario         @relation(fields: [clienteId], references: [id])
+  // Cuando colocamos que la FK va a ser opcional (puede ser nula) entonces la relacion tbn puede ser nula porque si llega a carecer el pedido de una direccion tbn carecera la relacion en ese registro
+  direccion      Direccion?      @relation(fields: [direccionId], references: [id])
+  detallePedidos DetallePedido[]
+
+  @@map("pedidos")
+}
+
+model DetallePedido {
+  id       String @id @default(uuid()) @db.Uuid
+  cantidad Int
+  precio   Float
+
+  pedidoId   String   @map("pedido_id") @db.Uuid
+  productoId String   @map("producto_id") @db.Uuid
+  pedido     Pedido   @relation(fields: [pedidoId], references: [id])
+  producto   Producto @relation(fields: [productoId], references: [id])
+}
+
+enum EstadoPedido {
+  RECIBIDO
+  EN_PREPARACION
+  COMPLETADO
 }

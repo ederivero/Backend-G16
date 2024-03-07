@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start:dev": "nodemon --env-file=.env src/index.js",
-    "start": "node src/index.js"
+    "start": "node src/index.js",
+    "prisma:migrate:save": "prisma migrate dev --preview-feature --create-only",
+    "prisma:migrate:run": "prisma migrate deploy --preview-feature"
   },
   "keywords": [
     "backend",
@@ -16,7 +18,9 @@
   "author": "Eduardo de Rivero",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^5.10.2",
     "express": "^4.18.3",
+    "joi": "^17.12.2",
     "prisma": "^5.10.2"
   },
   "devDependencies": {
