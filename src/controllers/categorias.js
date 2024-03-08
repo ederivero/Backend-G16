@@ -2,6 +2,8 @@ import { conexion } from '../conectores.js'
 import { crearCategoriaDto } from '../dto/categorias.dto.js'
 
 export async function crearCategoria(req, res) {
+    console.log(process.env.DATABASE_URL)
+    console.log(process.env.JWT_SECRET_KEY)
     const validacion = crearCategoriaDto.validate(req.body)
 
     if (validacion.error) {
