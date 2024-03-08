@@ -38,11 +38,12 @@ model Producto {
 }
 
 model Usuario {
-  id       String @id @default(uuid()) @db.Uuid
-  nombre   String
-  apellido String
-  correo   String @unique
-  password String
+  id          String      @id @default(uuid()) @db.Uuid
+  nombre      String
+  apellido    String
+  correo      String      @unique
+  password    String
+  tipoUsuario TipoUsuario @default(CLIENTE) @map("tipo_usuario")
 
   direcciones Direccion[]
   pedidos     Pedido[]
@@ -90,6 +91,12 @@ model DetallePedido {
   productoId String   @map("producto_id") @db.Uuid
   pedido     Pedido   @relation(fields: [pedidoId], references: [id])
   producto   Producto @relation(fields: [productoId], references: [id])
+}
+
+enum TipoUsuario {
+  ADMIN
+  EMPLEADO
+  CLIENTE
 }
 
 enum EstadoPedido {

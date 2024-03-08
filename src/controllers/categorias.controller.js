@@ -2,8 +2,6 @@ import { conexion } from '../conectores.js'
 import { crearCategoriaDto } from '../dto/categorias.dto.js'
 
 export async function crearCategoria(req, res) {
-    console.log(process.env.DATABASE_URL)
-    console.log(process.env.JWT_SECRET_KEY)
     const validacion = crearCategoriaDto.validate(req.body)
 
     if (validacion.error) {
@@ -17,5 +15,14 @@ export async function crearCategoria(req, res) {
     return res.status(201).json({
         message: 'Categoria creada exitosamente',
         content: categoriaCreada
+    })
+}
+
+export async function listarCategorias(req, res) {
+    // Devolver todas las categorias
+    const categorias = await conexion.categoria.findMany()
+
+    return res.json({
+        content: categorias
     })
 }
