@@ -1,24 +1,30 @@
 import { PrismaClient } from '@prisma/client'
-import { conexion } from '../../src/conectores'
 
 const conector = new PrismaClient()
 
 async function main() {
     await conector.categoria.upsert({
+        where: {
+            nombre: 'Bebidas'
+        },
         create: {
             nombre: 'Bebidas'
-        }, update: {}, where: {
-            nombre: 'Bedidas'
-        }
+        }, update: {
+            // tbn tengo que declarar los parametros que sean unicos
+            nombre: 'Bebidas'
+        },
     })
     await conector.categoria.upsert({
+        where: {
+            nombre: 'Pizzas'
+        },
         create: {
             nombre: 'Pizzas'
         },
-        update: {},
-        where: {
+        update: {
             nombre: 'Pizzas'
-        }
+        },
+
     })
 
     const productos = [{
@@ -39,7 +45,7 @@ async function main() {
 
     // Si todas las promesas se ejecutan correctamente entonces funcionara todo ok, si una de ellas falla entonces todo fallara
     // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/all
-    const resultado = await Promise.all(productos.map(async (producto) => {
+    await Promise.all(productos.map(async (producto) => {
         let categoria
 
         if (producto.nombre.includes('Pizza')) {
@@ -47,11 +53,16 @@ async function main() {
         } else {
             categoria = await conector.categoria.findFirstOrThrow({ where: { nombre: 'Bebidas' }, select: { id: true } })
         }
-
-        return { ...producto, categoriaId: categoria.id }
+        // al retornar un proceso asincrono esto se convertira en una promesa
+        return conector.producto.upsert({
+            where: { nombre: producto.nombre },
+            create: { ...producto, categoriaId: categoria.id },
+            update: { ...producto, categoriaId: categoria.id }
+        })
     }))
 
-    await conector.producto.createMany({ data: resultado })
-
-
 }
+
+main().catch((e) => {
+    console.error(e)
+})
