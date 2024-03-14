@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 import { conexion } from './conectores.js'
+import { TipoUsuario } from '@prisma/client'
 
 // middleware para corroborar la validez de la token
 export const validarToken = (req, res, next) => {
@@ -34,4 +35,26 @@ export const validarToken = (req, res, next) => {
             content: error.message
         })
     }
+}
+
+export const validarAdmin = (req, res, next) => {
+    // Este middleware tiene que ir luego del validarToken porque en ese middleware agregamos el req.user
+
+    const user = req.user
+
+    if (!user) {
+        // primero validamos que tengamos el req.user
+        return res.status(500).json({
+            message: 'Uso del middleware incorrecto'
+        })
+    }
+
+    if (user.tipo !== TipoUsuario.ADMIN) {
+        // el usuario no es administrador
+        return res.status(403).json({
+            message: 'Permisos insuficientes'
+        })
+    }
+
+    next()
 }
