@@ -40,10 +40,11 @@ export const crearPedido = async (req, res) => {
 
         const nuevoPedido = await cursor.pedido.create({
             data: {
-                estado: EstadoPedido.EN_PREPARACION,
+                estado: EstadoPedido.RECIBIDO,
                 fecha,
                 total: detalle.reduce((valorPrevio, valorActual) => {
-                    return valorPrevio + valorActual
+                    // valorActual sera toda la informacion del detalle osea {cantidad: ... , productoId:... , precio: ...}
+                    return valorPrevio + (valorActual.precio * valorActual.cantidad)
                 }, 0),
                 clienteId,
                 direccionId
@@ -64,5 +65,9 @@ export const crearPedido = async (req, res) => {
             )
         })
 
+    })
+
+    return res.status(201).json({
+        message: 'Pedido creado exitosamente'
     })
 }

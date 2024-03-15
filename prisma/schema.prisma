@@ -91,6 +91,8 @@ model DetallePedido {
   productoId String   @map("producto_id") @db.Uuid
   pedido     Pedido   @relation(fields: [pedidoId], references: [id])
   producto   Producto @relation(fields: [productoId], references: [id])
+
+  @@map("detalle_pedidos")
 }
 
 enum TipoUsuario {
