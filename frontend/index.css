@@ -1,0 +1,39 @@
+#container {
+    border: 1px solid black;
+}
+
+#mensajes {
+    height: 500px;
+    width: 100%;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+
+#formulario {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+}
+
+.izquierda {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.derecha {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.burbuja-texto {
+    border: 1px solid black;
+    border-radius: 20px;
+    background-color: white;
+    margin: 5px 15px;
+    padding: 10px 20px;
+}
+
+.oculto {
+    visibility: hidden
+}
