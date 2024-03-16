@@ -1,0 +1,37 @@
+db              >    mostrara la bd en la cual me encuentro
+use DATABASE    > cambiarnos a la bd indicada y si no existe la 'creara'
+
+db.TABLE.insertOne({data}) > sirve para insertar un nuevo registro en la tabla, si esta tabla no existe se creara caso contrario se agregara un nuevo registro
+
+en mongoDb no se puede crear definiciones de tablas como en SQL
+CREATE TABLE (id INT AUTO_INCREMENT,...) > esto no se puede en mongoDb
+
+db.personas.insertOne({ apellido: 'Martinez', nacionalidad: 'Mexicano', edad: 30, habilitado: true, fecha_nacimiento: new Date('1985-07-24') })
+
+CTRL + L > se limpia la consola
+
+db.personas.find() > obtiene todas las personas registradas
+
+db.personas.find({nombre:'Eduardo'}) > SELECT * FROM personas WHERE nombre = 'Eduardo'
+
+db.personas.find({}, {correo: true}) > SELECT correo FROM personas;
+
+
+db.productos.insertMany([
+{
+nombre:'Atun',
+precio:4.50,
+disponible: true,
+fecha_vencimiento: new Date('2024-07-27')
+},{
+nombre: 'Arroz',
+precio: 5.30,
+disponible: false,
+fecha_vencimiento: new Date('2024-09-15')
+},{
+nombre: 'Leche Condensada',
+precio: 9.40,
+disponible: true,
+fecha_vencimiento: new Date('2026-02-14')
+}
+])
