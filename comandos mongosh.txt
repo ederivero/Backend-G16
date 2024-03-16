@@ -35,3 +35,17 @@ disponible: true,
 fecha_vencimiento: new Date('2026-02-14')
 }
 ])
+
+db.productos.find({nombre: /a/ }) > SELECT * FROM productos WHERE nombre like '%a%';
+
+
+SELECT * FROM productos WHERE nombre = 'Leche Condensada' OR disponible = true;
+db.productos.find({ $or: [ {nombre: 'Leche Condensada'}, {disponible: true} ] })
+
+
+SELECT * FROM productos WHERE precio > 5 AND precio < 10
+db.productos.find({ $and: [{precio: {$gt: 5} }, { precio: {$lt: 10} }]})
+
+
+https://www.mongodb.com/docs/manual/reference/method/db.collection.updateOne/
+db.productos.updateOne({ nombre: 'Fideos Cabello de Angel' }, { $set: {precio: 7.20, disponible: false, procedencia: 'Peru' } }, {upsert: true})
